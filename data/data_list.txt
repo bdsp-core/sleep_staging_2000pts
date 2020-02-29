@@ -1,0 +1,2 @@
+signal_file	feature_file	status
+path/to/example.edf	path/to/example_output.mat	good
