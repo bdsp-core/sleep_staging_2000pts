@@ -23,7 +23,7 @@ seg_mask_explanation = [
     'NaN in feature']
 
     
-def segment_EEG(EEG, epoch_time, Fs, newFs, NW, amplitude_thres=500, notch_freq=None, bandpass_freq=None, start_end_remove_window_num=0, to_remove_mean=False, n_jobs=1, subject_file_name=''):#
+def segment_EEG(EEG, epoch_time, Fs, newFs, NW, amplitude_thres=500, notch_freq=None, bandpass_freq=None, start_end_remove_window_num=0, to_remove_mean=False, n_jobs=1):#
     """Segment EEG signals.
     """
     std_thres1 = 0.02

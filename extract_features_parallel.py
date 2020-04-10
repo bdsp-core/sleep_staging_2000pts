@@ -28,29 +28,11 @@ band_num = len(band_freq)
 combined_channel_names = ['F','C','O']
 combined_channel_num = len(combined_channel_names)
 
-#def compute_pxx_mt(EEG_seg, Fs, NW, window_length, window_step, segi, seg_num):
-#    # get multitaper spectrogram
-#    pxx_mt, freq = multitaper_spectrogram(EEG_seg, Fs, NW, window_length, window_step)
-#
-#    # take the average between left and right channels  ##########################THIS DEPENDS ON THE ACTUAL CHANNEL ORDERING!!!!!!
-#    pxx_mt[:,:,:-1] = (pxx_mt[:,:,:-1]+pxx_mt[:,:,1:])/2.0
-#    pxx_mt = np.delete(pxx_mt,[1,3,5],axis=2)
-#
-#    return pxx_mt, freq, segi, seg_num
 
-#def record_pxx_mt(result):
-#    global workers_done
-#    pxx_mts[result[2]] = result[0]
-#    freqs[result[2]] = result[1]
-#    workers_done = workers_done + 1
-#    if workers_done%10==0:
-#        print('%d/%d segments competed.'%(workers_done,result[3]))
-
-
-def compute_features_each_seg(eeg_seg, seg_size, channel_num, band_num, NW, Fs, freq, band_freq, total_freq_range, total_freq_id, window_length, window_step, dpss=None, eigvals=None, return_spec_only=False):
+def compute_features_each_seg(eeg_seg, seg_size, channel_num, band_num, NW, Fs, freq, band_freq, total_freq_range, total_freq_id, window_length, window_step, return_spec_only=False):
     # psd estimation, size=(window_num, freq_point_num, channel_num)
     # frequencies, size=(freq_point_num,)
-    spec_mt = multitaper_spectrogram(eeg_seg, Fs, NW, window_length, window_step, dpss=dpss, eigvals=eigvals)
+    spec_mt = multitaper_spectrogram(eeg_seg, Fs, NW, window_length, window_step)
     #total_findex = [i for i in range(len(freq)) if total_freq_range[0]<=freq[i]<total_freq_range[1]]
     
     if return_spec_only:
@@ -118,7 +100,7 @@ def compute_features_each_seg(eeg_seg, seg_size, channel_num, band_num, NW, Fs, 
     return np.r_[f1,f2,f3,f4,f5,f6,f7,f9,f10,f11,f12]#f8
 
 
-def extract_features(EEG_segs, channel_names, combined_channel_names, Fs, NW, total_freq_range, sub_window_time, sub_window_step, seg_start_ids, return_feature_names=False, n_jobs=-1, verbose=True):
+def extract_features(EEG_segs, channel_names, combined_channel_names, Fs, NW, total_freq_range, sub_window_time, sub_window_step, return_feature_names=False, n_jobs=-1, verbose=True):
     """Extract features from EEG segments.
 
     Arguments:
@@ -146,7 +128,6 @@ def extract_features(EEG_segs, channel_names, combined_channel_names, Fs, NW, to
     
     sub_window_size = int(round(sub_window_time*Fs))
     sub_step_size = int(round(sub_window_step*Fs))
-    dpss, eigvals = tsa.dpss_windows(sub_window_size,NW,2*NW)
     nfft = max(1<<(sub_window_size-1).bit_length(), sub_window_size)
     freq = np.arange(0, Fs, Fs*1.0/nfft)[:nfft//2+1]
     total_freq_id = np.where(np.logical_and(freq>=total_freq_range[0], freq<total_freq_range[1]))[0]
@@ -154,7 +135,7 @@ def extract_features(EEG_segs, channel_names, combined_channel_names, Fs, NW, to
     old_threshold = np.get_printoptions()['threshold']
     np.set_printoptions(threshold=sys.maxsize)#np.nan)
     
-    features = Parallel(n_jobs=n_jobs,verbose=verbose,backend='multiprocessing')(delayed(compute_features_each_seg)(EEG_segs[segi], window_size, channel_num, band_num, NW, Fs, freq, band_freq, total_freq_range, total_freq_id, sub_window_size, sub_step_size, dpss=dpss, eigvals=eigvals) for segi in range(seg_num))
+    features = Parallel(n_jobs=n_jobs,verbose=verbose,backend='multiprocessing')(delayed(compute_features_each_seg)(EEG_segs[segi], window_size, channel_num, band_num, NW, Fs, freq, band_freq, total_freq_range, total_freq_id, sub_window_size, sub_step_size) for segi in range(seg_num))
     
     np.set_printoptions(threshold=old_threshold)
 

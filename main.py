@@ -93,7 +93,7 @@ if __name__=='__main__':
 
             # segment EEG
             NW = 10
-            segs, seg_start_ids, seg_mask, specs, freqs = segment_EEG(EEG, epoch_time, Fs, newFs, NW, amplitude_thres=amplitude_thres, notch_freq=line_freq, bandpass_freq=bandpass_freq, start_end_remove_window_num=start_end_remove_epoch_num, to_remove_mean=False, n_jobs=-1, subject_file_name=subject_file_name)
+            segs, seg_start_ids, seg_mask, specs, freqs = segment_EEG(EEG, epoch_time, Fs, newFs, NW, amplitude_thres=amplitude_thres, notch_freq=line_freq, bandpass_freq=bandpass_freq, start_end_remove_window_num=start_end_remove_epoch_num, to_remove_mean=False, n_jobs=-1)
             Fs = newFs
 			
             if normal_only:
@@ -109,7 +109,7 @@ if __name__=='__main__':
 
             # extract features
             NW = 2
-            features, feature_names = extract_features(segs, EEG_channels, combined_channel_names, Fs, NW, bandpass_freq, sub_window_time, sub_window_step, seg_start_ids, return_feature_names=True, n_jobs=-1)
+            features, feature_names = extract_features(segs, EEG_channels, combined_channel_names, Fs, NW, bandpass_freq, sub_window_time, sub_window_step, return_feature_names=True, n_jobs=-1)
             features[np.isinf(features)] = np.nan
             nan_ids = np.where(np.any(np.isnan(features),axis=1))[0]
             for ii in nan_ids:
