@@ -7,7 +7,11 @@ import mne
 def load_dataset_mat(data_path):
 
     # load data
-    res = sio.loadmat(data_path)
+    try:
+        res = sio.loadmat(data_path)
+    except Exception as ee:
+        import mat73
+        res = mat73.loadmat(data_path)
     eeg = res['s'][:6]
     params = {'Fs':200}
     

@@ -31,8 +31,8 @@ amplitude_thres = 500 # [uV]
 newFs = 200  # [Hz]
 changepoint_epoch_num = 1
 sleep_stage_num = 5
-combined_EEG_channels = ['F','C','O']
-EEG_channels = ['F3-M2','F4-M1','C3-M2','C4-M1','O1-M2','O2-M1']
+combined_EEG_channels = ['C']#['F','C','O']
+EEG_channels = ['C3-M2','C4-M1']#['F3-M2','F4-M1','C3-M2','C4-M1','O1-M2','O2-M1']
 random_state = 1
 normal_only = True
 
@@ -87,8 +87,12 @@ if __name__=='__main__':
         print('\n====== [%d/%d] %s %s ======'%(si+1,subject_num,subject_file_name.replace('.mat',''),datetime.datetime.now()))
         try:
             # check and load dataset
-            EEG, params = load_dataset_edf(data_path)
-            #EEG, params = load_dataset_mat(data_path)
+            if data_path.lower().endswith('.edf'):
+                EEG, params = load_dataset_edf(data_path)
+            elif data_path.lower().endswith('.mat'):
+                EEG, params = load_dataset_mat(data_path)
+            else:
+                raise NotImplementedError('Unknown file type: '+data_path.split('.')[-1]+'. Need edf or mat')
             Fs = params.get('Fs')
 
             # segment EEG
