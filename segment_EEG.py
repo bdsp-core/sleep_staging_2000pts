@@ -84,6 +84,15 @@ def segment_EEG(EEG, epoch_time, Fs, newFs, NW, amplitude_thres=500, notch_freq=
     amplitude_large1d = np.where(np.any(amplitude_large2d, axis=1))[0]
     for i in amplitude_large1d:
         seg_masks[i] = seg_mask_explanation[5]
+    
+    """
+    thres = 3.5  # use with care, needs visual inspection
+    specs_db = 10*np.log10(specs)
+    bad_spec2d = np.any(np.abs(np.diff(np.diff(specs_db, axis=2), axis=2))>thres, axis=2)
+    bad_spec1d = np.where(np.any(bad_spec2d, axis=1))[0]
+    for i in bad_spec1d:
+        seg_masks[i] = seg_mask_explanation[7]
+    """
 
     return EEG_segs, start_ids, seg_masks, specs, freq
 
